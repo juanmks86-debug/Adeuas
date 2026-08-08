@@ -14,9 +14,10 @@
   --card-border: #e2d9c2;
   --radius: 4px;
 
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Source Sans 3', sans-serif;
-  --font-mono: 'IBM Plex Mono', monospace;
+  /* Fallbacks robustos: si no hay conexión (offline PWA) la app se ve bien igual */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -204,7 +205,7 @@ button {
 .prestamo-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   padding: 14px 4px;
   border-bottom: 1px solid var(--paper-line);
   background: none;
@@ -215,6 +216,20 @@ button {
   text-align: left;
   cursor: pointer;
   font-family: inherit;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .prestamo-row .quien {
@@ -269,10 +284,29 @@ button {
   line-height: 56px;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(31, 61, 47, 0.35);
+  box-shadow: 0 6px 16px rgba(31, 61, 47, 0.35), 0 2px 4px rgba(31, 61, 47, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.fab:hover {
+  box-shadow: 0 8px 20px rgba(31, 61, 47, 0.4), 0 3px 6px rgba(31, 61, 47, 0.3);
+}
+.fab:active {
+  transform: translateX(calc(-50% + 220px)) scale(0.94);
 }
 @media (max-width: 680px) {
   .fab { transform: none; right: 20px; left: auto; }
+  .fab:active { transform: scale(0.94); }
+}
+
+@keyframes view-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.view-transition {
+  animation: view-enter 0.18s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-transition { animation: none; }
 }
 
 /* ---- Detail / Form ---- */
@@ -371,6 +405,15 @@ button {
   color: var(--ink-soft);
   margin-top: 8px;
   white-space: pre-wrap;
+}
+
+.renovar-box {
+  background: var(--card);
+  border: 1px solid var(--gold);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-top: 4px;
 }
 
 /* ---- Buttons ---- */

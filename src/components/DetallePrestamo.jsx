@@ -146,7 +146,7 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
               </button>
             </div>
           ) : (
-            <form onSubmit={handleRenovar} className="notas-box" style={{ padding: 16 }}>
+            <form onSubmit={handleRenovar} className="renovar-box">
               <p style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--ink)' }}>
                 El nuevo capital va a ser el saldo pendiente actual:{' '}
                 <strong style={{ fontFamily: 'var(--font-mono)' }}>{formatMoney(saldo)}</strong>

@@ -94,6 +94,21 @@ export function formatMesCorto(yyyyMm) {
   return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
 }
 
+const COLORES_AVATAR = ['#1f3d2f', '#7a2b2b', '#a9762c', '#2f5744', '#55635a']
+
+export function iniciales(nombre) {
+  const partes = nombre.trim().split(/\s+/).filter(Boolean)
+  if (partes.length === 0) return '?'
+  if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase()
+  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
+}
+
+export function colorAvatar(nombre) {
+  let hash = 0
+  for (let i = 0; i < nombre.length; i++) hash = (hash * 31 + nombre.charCodeAt(i)) >>> 0
+  return COLORES_AVATAR[hash % COLORES_AVATAR.length]
+}
+
 // Renueva un préstamo: el saldo pendiente (capital + interés no pagado) pasa a ser
 // el nuevo capital, arranca un ciclo nuevo con nueva fecha/vencimiento/tasa, y el
 // ciclo anterior queda guardado en el historial del préstamo.

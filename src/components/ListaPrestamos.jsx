@@ -1,4 +1,13 @@
-import { saldoPendiente, estadoPrestamo, estadoLabel, formatMoney, formatDate } from '../prestamoUtils'
+import { saldoPendiente, estadoPrestamo, estadoLabel, formatMoney, formatDate, iniciales, colorAvatar } from '../prestamoUtils'
+
+function IlustracionVacio() {
+  return (
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="18" fill="none" stroke="var(--gold)" strokeWidth="1.4" strokeDasharray="3 3" />
+      <path d="M13 24 L18 17 L22 21 L27 14" fill="none" stroke="var(--gold)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
   const filtrados = prestamos.filter((p) => p.tipo === tab)
@@ -25,7 +34,7 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
       <div className="list">
         {filtrados.length === 0 && (
           <div className="empty-state">
-            <div className="glyph">§</div>
+            <IlustracionVacio />
             <p>
               {tab === 'doy'
                 ? 'Todavía no registraste préstamos que hayas dado.'
@@ -43,7 +52,10 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
               className={`prestamo-row ${p.tipo}`}
               onClick={() => onOpen(p.id)}
             >
-              <div>
+              <div className="avatar" style={{ background: colorAvatar(p.persona) }}>
+                {iniciales(p.persona)}
+              </div>
+              <div style={{ flex: 1 }}>
                 <div className="quien">{p.persona}</div>
                 <div className="meta">Desde {formatDate(p.fecha)}</div>
                 <span className={`estado-chip ${estado}`}>{estadoLabel(estado)}</span>
