@@ -7,12 +7,16 @@ import {
   estadoLabel,
   formatMoney,
   formatDate,
+  renovarPrestamo,
 } from '../prestamoUtils'
 import { storage } from '../storage'
 
 export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }) {
   const [montoPago, setMontoPago] = useState('')
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().slice(0, 10))
+  const [mostrarRenovar, setMostrarRenovar] = useState(false)
+  const [nuevaTasa, setNuevaTasa] = useState(prestamo.tasaInteres || '')
+  const [nuevaFechaVenc, setNuevaFechaVenc] = useState('')
 
   const saldo = saldoPendiente(prestamo)
   const estado = estadoPrestamo(prestamo)
@@ -31,6 +35,17 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
   function eliminarPago(id) {
     const pagos = (prestamo.pagos || []).filter((p) => p.id !== id)
     onUpdate({ ...prestamo, pagos })
+  }
+
+  function handleRenovar(e) {
+    e.preventDefault()
+    const renovado = renovarPrestamo(prestamo, {
+      fechaVencimiento: nuevaFechaVenc || null,
+      tasaInteres: nuevaTasa,
+    })
+    onUpdate(renovado)
+    setMostrarRenovar(false)
+    setNuevaFechaVenc('')
   }
 
   function handleDelete() {
@@ -121,6 +136,57 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
         </button>
       </form>
 
+      {saldo > 0 && (
+        <>
+          <div className="section-title">Resolver vencimiento</div>
+          {!mostrarRenovar ? (
+            <div className="action-row" style={{ marginTop: 0 }}>
+              <button className="btn btn-secondary" onClick={() => setMostrarRenovar(true)}>
+                Renovar préstamo
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleRenovar} className="notas-box" style={{ padding: 16 }}>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: 'var(--ink)' }}>
+                El nuevo capital va a ser el saldo pendiente actual:{' '}
+                <strong style={{ fontFamily: 'var(--font-mono)' }}>{formatMoney(saldo)}</strong>
+              </p>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="nuevaTasa">Nueva tasa de interés %</label>
+                  <input
+                    id="nuevaTasa"
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.1"
+                    value={nuevaTasa}
+                    onChange={(e) => setNuevaTasa(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="nuevaFechaVenc">Nuevo vencimiento</label>
+                  <input
+                    id="nuevaFechaVenc"
+                    type="date"
+                    value={nuevaFechaVenc}
+                    onChange={(e) => setNuevaFechaVenc(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="action-row" style={{ marginTop: 12 }}>
+                <button type="submit" className="btn btn-primary">
+                  Confirmar renovación
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setMostrarRenovar(false)}>
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          )}
+        </>
+      )}
+
       <div className="section-title">Historial de pagos</div>
       {(prestamo.pagos || []).length === 0 ? (
         <div className="empty-state" style={{ padding: '20px 0' }}>
@@ -144,6 +210,25 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
               </span>
             </div>
           ))
+      )}
+
+      {(prestamo.historial || []).length > 0 && (
+        <>
+          <div className="section-title">Historial de renovaciones</div>
+          {[...prestamo.historial].reverse().map((ciclo, i) => (
+            <div className="pago-row" key={i} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <span>
+                  {formatDate(ciclo.fecha)} → renovado {formatDate(ciclo.fechaRenovacion)}
+                </span>
+                <span className="monto">{formatMoney(ciclo.saldoAlRenovar)}</span>
+              </div>
+              <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>
+                Capital {formatMoney(ciclo.montoInicial)} · interés {ciclo.tasaInteres || 0}% · vencía {formatDate(ciclo.fechaVencimiento)}
+              </span>
+            </div>
+          ))}
+        </>
       )}
 
       <div className="action-row">

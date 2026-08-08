@@ -93,3 +93,28 @@ export function formatMesCorto(yyyyMm) {
   const d = new Date(y, m - 1, 1)
   return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
 }
+
+// Renueva un préstamo: el saldo pendiente (capital + interés no pagado) pasa a ser
+// el nuevo capital, arranca un ciclo nuevo con nueva fecha/vencimiento/tasa, y el
+// ciclo anterior queda guardado en el historial del préstamo.
+export function renovarPrestamo(p, { fechaVencimiento, tasaInteres, fecha }) {
+  const saldoAlRenovar = saldoPendiente(p)
+  const cicloAnterior = {
+    montoInicial: p.montoInicial,
+    tasaInteres: p.tasaInteres,
+    fecha: p.fecha,
+    fechaVencimiento: p.fechaVencimiento,
+    pagos: p.pagos || [],
+    saldoAlRenovar,
+    fechaRenovacion: fecha || new Date().toISOString().slice(0, 10),
+  }
+  return {
+    ...p,
+    montoInicial: saldoAlRenovar,
+    tasaInteres: tasaInteres !== undefined && tasaInteres !== '' ? Number(tasaInteres) : p.tasaInteres,
+    fecha: fecha || new Date().toISOString().slice(0, 10),
+    fechaVencimiento: fechaVencimiento || null,
+    pagos: [],
+    historial: [...(p.historial || []), cicloAnterior],
+  }
+}
