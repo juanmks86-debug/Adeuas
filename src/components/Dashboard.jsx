@@ -1,4 +1,5 @@
 import { saldoPendiente, formatMoney } from '../prestamoUtils'
+import EvolucionMensual from './EvolucionMensual'
 
 export default function Dashboard({ prestamos }) {
   const meDeben = prestamos
@@ -27,6 +28,7 @@ export default function Dashboard({ prestamos }) {
         <span>Balance neto</span>
         <strong>{formatMoney(neto)}</strong>
       </div>
+      <EvolucionMensual prestamos={prestamos} />
     </div>
   )
 }
