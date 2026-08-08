@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard'
 import ListaPrestamos from './components/ListaPrestamos'
 import FormPrestamo from './components/FormPrestamo'
 import DetallePrestamo from './components/DetallePrestamo'
+import BackupPanel from './components/BackupPanel'
 import './styles.css'
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
       <header className="app-header">
         <h1>Cuentas Claras</h1>
         <div className="subtitle">Lo que prestás y lo que debés, en un solo lugar</div>
+        <BackupPanel prestamos={prestamos} onImportar={setPrestamos} />
       </header>
 
       {view === 'lista' && (
