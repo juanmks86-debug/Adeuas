@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { storage } from '../storage'
+import { IconPersona, IconMonedas, IconCalendario, IconListaCuotas } from './icons'
 
 const hoy = () => new Date().toISOString().slice(0, 10)
 
@@ -66,85 +67,93 @@ export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel,
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="persona">{tipo === 'doy' ? 'A quién le prestás' : 'A quién le debés'}</label>
-          <input
-            id="persona"
-            type="text"
-            value={persona}
-            onChange={(e) => setPersona(e.target.value)}
-            placeholder="Nombre"
-            autoFocus
-          />
-        </div>
-
-        <div className="form-row">
+        <div className="form-section">
+          <div className="form-section-title"><IconPersona width="13" height="13" /> Quién y cuánto</div>
           <div className="form-group">
-            <label htmlFor="monto">Monto</label>
+            <label htmlFor="persona">{tipo === 'doy' ? 'A quién le prestás' : 'A quién le debés'}</label>
             <input
-              id="monto"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.01"
-              value={montoInicial}
-              onChange={(e) => setMontoInicial(e.target.value)}
-              placeholder="0"
+              id="persona"
+              type="text"
+              value={persona}
+              onChange={(e) => setPersona(e.target.value)}
+              placeholder="Nombre"
+              autoFocus
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="interes">Interés % (opcional)</label>
-            <input
-              id="interes"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.1"
-              value={tasaInteres}
-              onChange={(e) => setTasaInteres(e.target.value)}
-              placeholder="0"
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="fecha">Fecha</label>
-            <input id="fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
-          </div>
-          <div className="form-group">
-            <label htmlFor="venc">Vencimiento (opcional)</label>
-            <input
-              id="venc"
-              type="date"
-              value={fechaVencimiento}
-              onChange={(e) => setFechaVencimiento(e.target.value)}
-            />
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="monto">Monto</label>
+              <input
+                id="monto"
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={montoInicial}
+                onChange={(e) => setMontoInicial(e.target.value)}
+                placeholder="0"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="interes">Interés % (opcional)</label>
+              <input
+                id="interes"
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.1"
+                value={tasaInteres}
+                onChange={(e) => setTasaInteres(e.target.value)}
+                placeholder="0"
+              />
+            </div>
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="modalidad">Modalidad de pago</label>
-          <select id="modalidad" value={modalidad} onChange={(e) => setModalidad(e.target.value)}>
-            <option value="unico">Pago único</option>
-            <option value="cuotas">En cuotas</option>
-          </select>
+        <div className="form-section">
+          <div className="form-section-title"><IconCalendario width="13" height="13" /> Fechas</div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="fecha">Fecha</label>
+              <input id="fecha" type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label htmlFor="venc">Vencimiento (opcional)</label>
+              <input
+                id="venc"
+                type="date"
+                value={fechaVencimiento}
+                onChange={(e) => setFechaVencimiento(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
-        {modalidad === 'cuotas' && (
+        <div className="form-section">
+          <div className="form-section-title"><IconListaCuotas width="13" height="13" /> Modalidad</div>
           <div className="form-group">
-            <label htmlFor="cuotas">Cantidad de cuotas</label>
-            <input
-              id="cuotas"
-              type="number"
-              min="1"
-              step="1"
-              value={cantidadCuotas}
-              onChange={(e) => setCantidadCuotas(e.target.value)}
-              placeholder="Ej: 6"
-            />
+            <label htmlFor="modalidad">Modalidad de pago</label>
+            <select id="modalidad" value={modalidad} onChange={(e) => setModalidad(e.target.value)}>
+              <option value="unico">Pago único</option>
+              <option value="cuotas">En cuotas</option>
+            </select>
           </div>
-        )}
+
+          {modalidad === 'cuotas' && (
+            <div className="form-group">
+              <label htmlFor="cuotas">Cantidad de cuotas</label>
+              <input
+                id="cuotas"
+                type="number"
+                min="1"
+                step="1"
+                value={cantidadCuotas}
+                onChange={(e) => setCantidadCuotas(e.target.value)}
+                placeholder="Ej: 6"
+              />
+            </div>
+          )}
+        </div>
 
         <div className="form-group">
           <label htmlFor="notas">Notas (opcional)</label>

@@ -407,6 +407,17 @@ button {
 .field-grid .field-label { color: var(--ink-soft); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
 .field-grid .field-value { font-family: var(--font-mono); margin-top: 2px; }
 
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.icon-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .section-title {
   font-size: 12px;
   text-transform: uppercase;
@@ -628,6 +639,28 @@ button {
   resize: vertical;
   min-height: 60px;
 }
+.form-section {
+  padding: 14px 0 4px;
+  border-top: 1px solid var(--paper-line);
+  margin-top: 4px;
+}
+.form-section:first-child {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

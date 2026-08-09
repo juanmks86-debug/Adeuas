@@ -11,6 +11,7 @@ import {
   cronogramaCuotas,
 } from '../prestamoUtils'
 import { storage } from '../storage'
+import { IconMonedas, IconRenovar, IconPapelera, IconLapiz, IconListaCuotas } from './icons'
 
 export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, onEditar }) {
   const [montoPago, setMontoPago] = useState('')
@@ -59,7 +60,9 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
     <div className="screen">
       <div className="back-row" style={{ justifyContent: 'space-between' }}>
         <button className="back-btn" onClick={onBack}>← Volver</button>
-        <button className="back-btn" onClick={() => onEditar(prestamo.id)}>Editar</button>
+        <button className="back-btn icon-btn" onClick={() => onEditar(prestamo.id)}>
+          <IconLapiz width="13" height="13" /> Editar
+        </button>
       </div>
 
       <div className="detail-header">
@@ -109,7 +112,7 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
         </>
       )}
 
-      <div className="section-title">Registrar pago</div>
+      <div className="section-title icon-title"><IconMonedas width="13" height="13" /> Registrar pago</div>
       <form className="pago-form" onSubmit={registrarPago}>
         <div className="form-group">
           <label htmlFor="montoPago">Monto</label>
@@ -143,8 +146,8 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
           <div className="section-title">Resolver vencimiento</div>
           {!mostrarRenovar ? (
             <div className="action-row" style={{ marginTop: 0 }}>
-              <button className="btn btn-secondary" onClick={() => setMostrarRenovar(true)}>
-                Renovar préstamo
+              <button className="btn btn-secondary icon-btn" onClick={() => setMostrarRenovar(true)}>
+                <IconRenovar width="14" height="14" /> Renovar préstamo
               </button>
             </div>
           ) : (
@@ -191,7 +194,7 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
 
       {prestamo.modalidad === 'cuotas' && cronogramaCuotas(prestamo).length > 0 && (
         <>
-          <div className="section-title">Cronograma de cuotas</div>
+          <div className="section-title icon-title"><IconListaCuotas width="13" height="13" /> Cronograma de cuotas</div>
           {cronogramaCuotas(prestamo).map((c) => (
             <div className="cuota-row" key={c.numero}>
               <span className="cuota-numero">#{c.numero}</span>
@@ -250,8 +253,8 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
       )}
 
       <div className="action-row">
-        <button className="btn btn-danger" onClick={handleDelete}>
-          Eliminar préstamo
+        <button className="btn btn-danger icon-btn" onClick={handleDelete}>
+          <IconPapelera width="14" height="14" /> Eliminar préstamo
         </button>
       </div>
     </div>
