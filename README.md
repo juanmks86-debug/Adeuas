@@ -214,3 +214,10 @@ inicio). Una vez instalada:
 - Multi-moneda.
 - Notas por pago individual (ej. "efectivo", "transferencia").
 - Contacto directo (llamar / WhatsApp) desde el detalle de un préstamo.
+
+## Créditos
+
+El ícono de la app ("Prestar") es de [surang en
+Flaticon](https://www.flaticon.es/iconos-gratis/prestar), usado bajo la
+licencia gratuita de Flaticon que requiere atribución.
+
