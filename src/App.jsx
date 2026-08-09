@@ -5,12 +5,18 @@ import ListaPrestamos from './components/ListaPrestamos'
 import FormPrestamo from './components/FormPrestamo'
 import DetallePrestamo from './components/DetallePrestamo'
 import BackupPanel from './components/BackupPanel'
+import TabBar from './components/TabBar'
+import GraficosScreen from './components/GraficosScreen'
+import CalculosScreen from './components/CalculosScreen'
+import InteresesScreen from './components/InteresesScreen'
+import PersonasScreen from './components/PersonasScreen'
 import './styles.css'
 
 export default function App() {
   const [prestamos, setPrestamos] = useState(() => storage.load())
   const [tab, setTab] = useState('doy')
-  const [view, setView] = useState('lista') // 'lista' | 'nuevo' | 'detalle' | 'editar'
+  const [seccion, setSeccion] = useState('inicio') // 'inicio' | 'graficos' | 'calculos' | 'intereses' | 'personas'
+  const [view, setView] = useState('lista') // dentro de 'inicio': 'lista' | 'nuevo' | 'detalle' | 'editar'
   const [selectedId, setSelectedId] = useState(null)
 
   useEffect(() => {
@@ -38,6 +44,7 @@ export default function App() {
   }
 
   function openDetalle(id) {
+    setSeccion('inicio')
     setSelectedId(id)
     setView('detalle')
   }
@@ -47,7 +54,13 @@ export default function App() {
     setView('editar')
   }
 
+  function cambiarSeccion(s) {
+    setSeccion(s)
+    setView('lista')
+  }
+
   const seleccionado = prestamos.find((p) => p.id === selectedId)
+  const mostrarTabBar = seccion !== 'inicio' || view === 'lista'
 
   return (
     <div className="app">
@@ -57,7 +70,9 @@ export default function App() {
         <BackupPanel prestamos={prestamos} onImportar={setPrestamos} />
       </header>
 
-      {view === 'lista' && (
+      {mostrarTabBar && <TabBar activa={seccion} onCambiar={cambiarSeccion} />}
+
+      {seccion === 'inicio' && view === 'lista' && (
         <div className="view-transition" key="lista">
           <Dashboard prestamos={prestamos} onAbrirPrestamo={openDetalle} />
           <ListaPrestamos
@@ -72,7 +87,7 @@ export default function App() {
         </div>
       )}
 
-      {view === 'nuevo' && (
+      {seccion === 'inicio' && view === 'nuevo' && (
         <div className="view-transition" key="nuevo">
           <FormPrestamo
             tipoInicial={tab}
@@ -82,7 +97,7 @@ export default function App() {
         </div>
       )}
 
-      {view === 'editar' && seleccionado && (
+      {seccion === 'inicio' && view === 'editar' && seleccionado && (
         <div className="view-transition" key={`editar-${seleccionado.id}`}>
           <FormPrestamo
             prestamoExistente={seleccionado}
@@ -92,7 +107,7 @@ export default function App() {
         </div>
       )}
 
-      {view === 'detalle' && seleccionado && (
+      {seccion === 'inicio' && view === 'detalle' && seleccionado && (
         <div className="view-transition" key={seleccionado.id}>
           <DetallePrestamo
             prestamo={seleccionado}
@@ -101,6 +116,30 @@ export default function App() {
             onDelete={handleDelete}
             onEditar={openEditar}
           />
+        </div>
+      )}
+
+      {seccion === 'graficos' && (
+        <div className="view-transition" key="graficos">
+          <GraficosScreen prestamos={prestamos} />
+        </div>
+      )}
+
+      {seccion === 'calculos' && (
+        <div className="view-transition" key="calculos">
+          <CalculosScreen prestamos={prestamos} />
+        </div>
+      )}
+
+      {seccion === 'intereses' && (
+        <div className="view-transition" key="intereses">
+          <InteresesScreen prestamos={prestamos} />
+        </div>
+      )}
+
+      {seccion === 'personas' && (
+        <div className="view-transition" key="personas">
+          <PersonasScreen prestamos={prestamos} onAbrirPrestamo={openDetalle} />
         </div>
       )}
     </div>

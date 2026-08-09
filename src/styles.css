@@ -475,7 +475,75 @@ button {
   margin-top: 4px;
 }
 
-/* ---- Search ---- */
+/* ---- Tab bar (estilo WhatsApp, pegada al header) ---- */
+.tabbar {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--paper-line);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.tabbar::-webkit-scrollbar { display: none; }
+.tabbar-item {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.tabbar-item.active {
+  color: var(--forest);
+  border-bottom: 2px solid var(--forest);
+}
+
+/* ---- Comparativo de barras ---- */
+.bar-comparativa {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bar-comparativa-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bar-comparativa-label {
+  width: 64px;
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+.bar-comparativa-track {
+  flex: 1;
+  height: 10px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.bar-comparativa-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+.bar-comparativa-fill.a-favor { background: var(--forest); }
+.bar-comparativa-fill.en-contra { background: var(--wine); }
+.bar-comparativa-valor {
+  width: 84px;
+  flex-shrink: 0;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+}
 .search-wrap {
   padding: 10px 20px 0;
 }

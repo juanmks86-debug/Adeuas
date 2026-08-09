@@ -184,3 +184,67 @@ export function renovarPrestamo(p, { fechaVencimiento, tasaInteres, fecha }) {
     historial: [...(p.historial || []), cicloAnterior],
   }
 }
+
+function round2(n) {
+  return Math.round(n * 100) / 100
+}
+
+// Proyecta cómo crece un capital con una tasa de interés por período, en modo
+// simple (interés siempre sobre el capital original) o compuesto (interés sobre
+// el saldo acumulado, como hace la app al renovar un préstamo impago).
+export function proyeccionInteres(capital, tasaPorPeriodo, cantidadPeriodos, modo = 'compuesto') {
+  const tasa = tasaPorPeriodo / 100
+  const filas = []
+  let saldo = capital
+  for (let i = 1; i <= cantidadPeriodos; i++) {
+    const interesDelPeriodo = modo === 'compuesto' ? saldo * tasa : capital * tasa
+    saldo = modo === 'compuesto' ? saldo + interesDelPeriodo : capital + capital * tasa * i
+    filas.push({
+      periodo: i,
+      interesDelPeriodo: round2(interesDelPeriodo),
+      saldoAcumulado: round2(saldo),
+    })
+  }
+  return filas
+}
+
+// Interés efectivamente cobrado/pagado hasta ahora, sumando todos los ciclos
+// (incluidas renovaciones pasadas) de todos los préstamos: lo que se pagó por
+// encima del capital de cada ciclo se cuenta como interés.
+export function interesesNetos(prestamos) {
+  let cobrado = 0
+  let pagado = 0
+  for (const p of prestamos) {
+    const ciclos = [
+      ...(p.historial || []).map((c) => ({ montoInicial: c.montoInicial, pagos: c.pagos || [] })),
+      { montoInicial: p.montoInicial, pagos: p.pagos || [] },
+    ]
+    for (const c of ciclos) {
+      const totalPagadoCiclo = c.pagos.reduce((acc, x) => acc + Number(x.monto), 0)
+      const interes = Math.max(0, totalPagadoCiclo - c.montoInicial)
+      if (p.tipo === 'doy') cobrado += interes
+      else pagado += interes
+    }
+  }
+  return { cobrado: round2(cobrado), pagado: round2(pagado), neto: round2(cobrado - pagado) }
+}
+
+// Agrupa todos los préstamos por persona (sin importar mayúsculas/espacios) y
+// calcula el saldo neto que tenés con cada una.
+export function agruparPorPersona(prestamos) {
+  const mapa = new Map()
+  for (const p of prestamos) {
+    const key = p.persona.trim().toLowerCase()
+    if (!mapa.has(key)) {
+      mapa.set(key, { persona: p.persona.trim(), prestamos: [], saldoDoy: 0, saldoTomo: 0 })
+    }
+    const entry = mapa.get(key)
+    entry.prestamos.push(p)
+    const saldo = saldoPendiente(p)
+    if (p.tipo === 'doy') entry.saldoDoy += saldo
+    else entry.saldoTomo += saldo
+  }
+  return Array.from(mapa.values())
+    .map((e) => ({ ...e, neto: round2(e.saldoDoy - e.saldoTomo) }))
+    .sort((a, b) => Math.abs(b.neto) - Math.abs(a.neto))
+}
