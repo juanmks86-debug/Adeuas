@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { agruparPorPersona, formatMoney, saldoPendiente, iniciales, colorAvatar } from '../prestamoUtils'
+import { agruparPorPersona, rankingRiesgo, formatMoney, saldoPendiente, iniciales, colorAvatar } from '../prestamoUtils'
 
 export default function PersonasScreen({ prestamos, onAbrirPrestamo }) {
   const [expandido, setExpandido] = useState(null)
   const grupos = agruparPorPersona(prestamos)
+  const riesgosos = rankingRiesgo(prestamos)
 
   if (grupos.length === 0) {
     return (
@@ -24,6 +25,22 @@ export default function PersonasScreen({ prestamos, onAbrirPrestamo }) {
         Balance consolidado por cada persona, sumando todos sus préstamos.
       </p>
 
+      {riesgosos.length > 0 && (
+        <div className="renovar-box" style={{ margin: '0 20px 16px' }}>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700, color: 'var(--gold)', marginBottom: 8 }}>
+            Renovaron sin terminar de pagar
+          </div>
+          {riesgosos.slice(0, 3).map((g) => (
+            <div key={g.persona} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, padding: '4px 0' }}>
+              <span>{g.persona}</span>
+              <span style={{ color: 'var(--ink-soft)' }}>
+                {g.renovaciones} renovación{g.renovaciones === 1 ? '' : 'es'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="list" style={{ padding: '0 20px' }}>
         {grupos.map((g) => {
           const key = g.persona.toLowerCase()
@@ -41,6 +58,7 @@ export default function PersonasScreen({ prestamos, onAbrirPrestamo }) {
                   <div className="quien">{g.persona}</div>
                   <div className="meta">
                     {g.prestamos.length} préstamo{g.prestamos.length === 1 ? '' : 's'}
+                    {g.renovaciones > 0 && ` · ${g.renovaciones} renovación${g.renovaciones === 1 ? '' : 'es'}`}
                   </div>
                 </div>
                 <div className="right">

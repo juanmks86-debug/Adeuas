@@ -109,6 +109,7 @@ button {
 }
 .backup-msg.ok { color: var(--forest-soft); }
 .backup-msg.error { color: var(--wine); }
+.backup-msg.aviso { color: var(--gold); }
 
 /* ---- Ledger rule (signature element) ---- */
 .ledger {

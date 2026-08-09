@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 
+const KEY_ULTIMO_BACKUP = 'cuentas-claras:ultimo-backup'
+
 function descargarJSON(prestamos) {
   const payload = {
     app: 'cuentas-claras',
@@ -17,6 +19,7 @@ function descargarJSON(prestamos) {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+  localStorage.setItem(KEY_ULTIMO_BACKUP, fecha)
 }
 
 // Combina lo importado con lo actual: si un préstamo tiene el mismo id en ambos,
@@ -29,13 +32,22 @@ function fusionar(actuales, importados) {
   return Array.from(mapa.values())
 }
 
+function diasDesdeUltimoBackup() {
+  const ultimo = localStorage.getItem(KEY_ULTIMO_BACKUP)
+  if (!ultimo) return null
+  const dias = Math.floor((Date.now() - new Date(ultimo + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24))
+  return dias
+}
+
 export default function BackupPanel({ prestamos, onImportar }) {
   const inputRef = useRef(null)
   const [mensaje, setMensaje] = useState(null)
   const [error, setError] = useState(null)
+  const [dias, setDias] = useState(diasDesdeUltimoBackup)
 
   function handleExportar() {
     descargarJSON(prestamos)
+    setDias(0)
   }
 
   function handleArchivoSeleccionado(e) {
@@ -69,6 +81,13 @@ export default function BackupPanel({ prestamos, onImportar }) {
     e.target.value = ''
   }
 
+  const avisoBackup =
+    prestamos.length > 0 && (dias === null || dias >= 30)
+      ? dias === null
+        ? 'Todavía no hiciste ningún respaldo. Te recomendamos exportar tus datos.'
+        : `Hace ${dias} días que no exportás un respaldo.`
+      : null
+
   return (
     <div className="backup-panel">
       <button className="backup-btn" onClick={handleExportar} title="Descargar una copia de tus datos">
@@ -92,6 +111,7 @@ export default function BackupPanel({ prestamos, onImportar }) {
       />
       {mensaje && <div className="backup-msg ok">{mensaje}</div>}
       {error && <div className="backup-msg error">{error}</div>}
+      {!mensaje && !error && avisoBackup && <div className="backup-msg aviso">{avisoBackup}</div>}
     </div>
   )
 }

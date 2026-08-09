@@ -4,6 +4,7 @@ const TABS = [
   { id: 'calculos', label: 'Cálculos' },
   { id: 'intereses', label: 'Intereses' },
   { id: 'personas', label: 'Personas' },
+  { id: 'historial', label: 'Historial' },
 ]
 
 export default function TabBar({ activa, onCambiar }) {

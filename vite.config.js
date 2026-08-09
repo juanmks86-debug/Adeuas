@@ -19,6 +19,20 @@ export default defineConfig({
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }
+        ],
+        shortcuts: [
+          {
+            name: 'Nuevo préstamo que doy',
+            short_name: 'Presto',
+            url: '/?nuevo=doy',
+            icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }]
+          },
+          {
+            name: 'Nuevo préstamo que tomo',
+            short_name: 'Debo',
+            url: '/?nuevo=tomo',
+            icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }]
+          }
         ]
       }
     })

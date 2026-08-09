@@ -10,18 +10,31 @@ import GraficosScreen from './components/GraficosScreen'
 import CalculosScreen from './components/CalculosScreen'
 import InteresesScreen from './components/InteresesScreen'
 import PersonasScreen from './components/PersonasScreen'
+import HistorialScreen from './components/HistorialScreen'
 import './styles.css'
 
 export default function App() {
   const [prestamos, setPrestamos] = useState(() => storage.load())
   const [tab, setTab] = useState('doy')
-  const [seccion, setSeccion] = useState('inicio') // 'inicio' | 'graficos' | 'calculos' | 'intereses' | 'personas'
+  const [seccion, setSeccion] = useState('inicio') // 'inicio' | 'graficos' | 'calculos' | 'intereses' | 'personas' | 'historial'
   const [view, setView] = useState('lista') // dentro de 'inicio': 'lista' | 'nuevo' | 'detalle' | 'editar'
   const [selectedId, setSelectedId] = useState(null)
 
   useEffect(() => {
     storage.save(prestamos)
   }, [prestamos])
+
+  // Acceso directo de la PWA: /?nuevo=doy o /?nuevo=tomo abre el formulario de alta.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const nuevo = params.get('nuevo')
+    if (nuevo === 'doy' || nuevo === 'tomo') {
+      setTab(nuevo)
+      setSeccion('inicio')
+      setView('nuevo')
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
 
   function handleSave(nuevo) {
     setPrestamos((prev) => {
@@ -140,6 +153,12 @@ export default function App() {
       {seccion === 'personas' && (
         <div className="view-transition" key="personas">
           <PersonasScreen prestamos={prestamos} onAbrirPrestamo={openDetalle} />
+        </div>
+      )}
+
+      {seccion === 'historial' && (
+        <div className="view-transition" key="historial">
+          <HistorialScreen prestamos={prestamos} onAbrirPrestamo={openDetalle} />
         </div>
       )}
     </div>

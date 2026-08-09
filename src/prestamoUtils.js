@@ -236,15 +236,53 @@ export function agruparPorPersona(prestamos) {
   for (const p of prestamos) {
     const key = p.persona.trim().toLowerCase()
     if (!mapa.has(key)) {
-      mapa.set(key, { persona: p.persona.trim(), prestamos: [], saldoDoy: 0, saldoTomo: 0 })
+      mapa.set(key, { persona: p.persona.trim(), prestamos: [], saldoDoy: 0, saldoTomo: 0, renovaciones: 0 })
     }
     const entry = mapa.get(key)
     entry.prestamos.push(p)
     const saldo = saldoPendiente(p)
-    if (p.tipo === 'doy') entry.saldoDoy += saldo
-    else entry.saldoTomo += saldo
+    if (p.tipo === 'doy') {
+      entry.saldoDoy += saldo
+      entry.renovaciones += (p.historial || []).length
+    } else {
+      entry.saldoTomo += saldo
+    }
   }
   return Array.from(mapa.values())
     .map((e) => ({ ...e, neto: round2(e.saldoDoy - e.saldoTomo) }))
     .sort((a, b) => Math.abs(b.neto) - Math.abs(a.neto))
+}
+
+// Ranking de personas que más veces renovaron sin terminar de pagar (solo
+// préstamos que vos diste). Útil para decidir a quién no convendría prestarle de nuevo.
+export function rankingRiesgo(prestamos) {
+  return agruparPorPersona(prestamos)
+    .filter((g) => g.renovaciones > 0)
+    .sort((a, b) => b.renovaciones - a.renovaciones)
+}
+
+// Lista plana de todos los pagos de todos los préstamos (incluidos los de
+// ciclos ya cerrados por renovaciones), ordenada del más reciente al más viejo.
+export function historialPagosGeneral(prestamos) {
+  const items = []
+  for (const p of prestamos) {
+    for (const pago of p.pagos || []) {
+      items.push({ prestamoId: p.id, persona: p.persona, tipo: p.tipo, fecha: pago.fecha, monto: Number(pago.monto) })
+    }
+    for (const ciclo of p.historial || []) {
+      for (const pago of ciclo.pagos || []) {
+        items.push({ prestamoId: p.id, persona: p.persona, tipo: p.tipo, fecha: pago.fecha, monto: Number(pago.monto) })
+      }
+    }
+  }
+  return items.sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
+}
+
+// Texto listo para copiar y mandar como comprobante de un pago recibido/hecho.
+export function textoComprobante(prestamo, pago, saldoRestante) {
+  const accion = prestamo.tipo === 'doy' ? 'Recibí de' : 'Le pagué a'
+  return (
+    `${accion} ${prestamo.persona}: ${formatMoney(pago.monto)} el ${formatDate(pago.fecha)}.\n` +
+    `Saldo restante: ${formatMoney(saldoRestante)}.`
+  )
 }

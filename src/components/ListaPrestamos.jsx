@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { saldoPendiente, estadoPrestamo, estadoLabel, formatMoney, formatDate, iniciales, colorAvatar } from '../prestamoUtils'
 
 function IlustracionVacio() {
@@ -10,13 +10,34 @@ function IlustracionVacio() {
   )
 }
 
+function ordenar(lista, criterio) {
+  const copia = [...lista]
+  switch (criterio) {
+    case 'vencimiento':
+      return copia.sort((a, b) => {
+        if (!a.fechaVencimiento) return 1
+        if (!b.fechaVencimiento) return -1
+        return a.fechaVencimiento < b.fechaVencimiento ? -1 : 1
+      })
+    case 'monto':
+      return copia.sort((a, b) => saldoPendiente(b) - saldoPendiente(a))
+    case 'alfabetico':
+      return copia.sort((a, b) => a.persona.localeCompare(b.persona, 'es'))
+    default:
+      return copia // orden de carga (más reciente primero, ya viene así del array)
+  }
+}
+
 export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
   const [busqueda, setBusqueda] = useState('')
+  const [orden, setOrden] = useState('reciente')
 
   const delTab = prestamos.filter((p) => p.tipo === tab)
   const filtrados = busqueda.trim()
     ? delTab.filter((p) => p.persona.toLowerCase().includes(busqueda.trim().toLowerCase()))
     : delTab
+
+  const ordenados = useMemo(() => ordenar(filtrados, orden), [filtrados, orden])
 
   const countDoy = prestamos.filter((p) => p.tipo === 'doy').length
   const countTomo = prestamos.filter((p) => p.tipo === 'tomo').length
@@ -39,7 +60,7 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
       </div>
 
       {delTab.length > 0 && (
-        <div className="search-wrap">
+        <div className="search-wrap" style={{ display: 'flex', gap: 8 }}>
           <input
             type="search"
             className="search-input"
@@ -47,11 +68,22 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
           />
+          <select
+            className="search-input"
+            style={{ flexShrink: 0, width: 'auto' }}
+            value={orden}
+            onChange={(e) => setOrden(e.target.value)}
+          >
+            <option value="reciente">Más reciente</option>
+            <option value="vencimiento">Por vencimiento</option>
+            <option value="monto">Por monto</option>
+            <option value="alfabetico">Alfabético</option>
+          </select>
         </div>
       )}
 
       <div className="list">
-        {filtrados.length === 0 && (
+        {ordenados.length === 0 && (
           <div className="empty-state">
             <IlustracionVacio />
             <p>
@@ -64,7 +96,7 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
           </div>
         )}
 
-        {filtrados.map((p) => {
+        {ordenados.map((p) => {
           const saldo = saldoPendiente(p)
           const estado = estadoPrestamo(p)
           return (

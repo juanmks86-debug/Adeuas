@@ -9,6 +9,7 @@ import {
   formatDate,
   renovarPrestamo,
   cronogramaCuotas,
+  textoComprobante,
 } from '../prestamoUtils'
 import { storage } from '../storage'
 import { IconMonedas, IconRenovar, IconPapelera, IconLapiz, IconListaCuotas } from './icons'
@@ -19,6 +20,7 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
   const [mostrarRenovar, setMostrarRenovar] = useState(false)
   const [nuevaTasa, setNuevaTasa] = useState(prestamo.tasaInteres || '')
   const [nuevaFechaVenc, setNuevaFechaVenc] = useState('')
+  const [copiadoId, setCopiadoId] = useState(null)
 
   const saldo = saldoPendiente(prestamo)
   const estado = estadoPrestamo(prestamo)
@@ -37,6 +39,14 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
   function eliminarPago(id) {
     const pagos = (prestamo.pagos || []).filter((p) => p.id !== id)
     onUpdate({ ...prestamo, pagos })
+  }
+
+  function copiarComprobante(pago, saldoEnEseMomento) {
+    const texto = textoComprobante(prestamo, pago, saldoEnEseMomento)
+    navigator.clipboard.writeText(texto).then(() => {
+      setCopiadoId(pago.id)
+      setTimeout(() => setCopiadoId(null), 2000)
+    })
   }
 
   function handleRenovar(e) {
@@ -214,23 +224,37 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
           <p>Todavía no hay pagos registrados.</p>
         </div>
       ) : (
-        [...prestamo.pagos]
-          .sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
-          .map((pago) => (
-            <div className="pago-row" key={pago.id}>
-              <span>{formatDate(pago.fecha)}</span>
-              <span className="monto">
-                {formatMoney(pago.monto)}{' '}
-                <button
-                  className="btn-danger"
-                  style={{ marginLeft: 8, fontSize: 12 }}
-                  onClick={() => eliminarPago(pago.id)}
-                >
-                  quitar
-                </button>
-              </span>
-            </div>
-          ))
+        (() => {
+          const ordenados = [...prestamo.pagos].sort((a, b) => (a.fecha < b.fecha ? 1 : -1))
+          return ordenados.map((pago, idx) => {
+            const pagadoHastaAca = ordenados
+              .slice(idx)
+              .reduce((acc, p) => acc + Number(p.monto), 0)
+            const saldoEnEseMomento = Math.max(0, Math.round((total - pagadoHastaAca) * 100) / 100)
+            return (
+              <div className="pago-row" key={pago.id}>
+                <span>{formatDate(pago.fecha)}</span>
+                <span className="monto">
+                  {formatMoney(pago.monto)}{' '}
+                  <button
+                    className="btn-secondary"
+                    style={{ marginLeft: 8, fontSize: 11, padding: '3px 8px' }}
+                    onClick={() => copiarComprobante(pago, saldoEnEseMomento)}
+                  >
+                    {copiadoId === pago.id ? 'Copiado ✓' : 'copiar'}
+                  </button>
+                  <button
+                    className="btn-danger"
+                    style={{ marginLeft: 6, fontSize: 12 }}
+                    onClick={() => eliminarPago(pago.id)}
+                  >
+                    quitar
+                  </button>
+                </span>
+              </div>
+            )
+          })
+        })()
       )}
 
       {(prestamo.historial || []).length > 0 && (
