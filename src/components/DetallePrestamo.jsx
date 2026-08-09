@@ -8,10 +8,11 @@ import {
   formatMoney,
   formatDate,
   renovarPrestamo,
+  cronogramaCuotas,
 } from '../prestamoUtils'
 import { storage } from '../storage'
 
-export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }) {
+export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, onEditar }) {
   const [montoPago, setMontoPago] = useState('')
   const [fechaPago, setFechaPago] = useState(new Date().toISOString().slice(0, 10))
   const [mostrarRenovar, setMostrarRenovar] = useState(false)
@@ -56,8 +57,9 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
 
   return (
     <div className="screen">
-      <div className="back-row">
+      <div className="back-row" style={{ justifyContent: 'space-between' }}>
         <button className="back-btn" onClick={onBack}>← Volver</button>
+        <button className="back-btn" onClick={() => onEditar(prestamo.id)}>Editar</button>
       </div>
 
       <div className="detail-header">
@@ -184,6 +186,22 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete }
               </div>
             </form>
           )}
+        </>
+      )}
+
+      {prestamo.modalidad === 'cuotas' && cronogramaCuotas(prestamo).length > 0 && (
+        <>
+          <div className="section-title">Cronograma de cuotas</div>
+          {cronogramaCuotas(prestamo).map((c) => (
+            <div className="cuota-row" key={c.numero}>
+              <span className="cuota-numero">#{c.numero}</span>
+              <span className="cuota-fecha">
+                <span className={`cuota-estado-dot ${c.estado}`} />
+                {formatDate(c.fechaVencimiento)}
+              </span>
+              <span className="cuota-monto">{formatMoney(c.monto)}</span>
+            </div>
+          ))}
         </>
       )}
 

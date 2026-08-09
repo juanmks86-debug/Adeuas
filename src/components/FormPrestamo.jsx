@@ -3,24 +3,25 @@ import { storage } from '../storage'
 
 const hoy = () => new Date().toISOString().slice(0, 10)
 
-export default function FormPrestamo({ tipoInicial, onCancel, onSave }) {
-  const [tipo, setTipo] = useState(tipoInicial || 'doy')
-  const [persona, setPersona] = useState('')
-  const [montoInicial, setMontoInicial] = useState('')
-  const [fecha, setFecha] = useState(hoy())
-  const [fechaVencimiento, setFechaVencimiento] = useState('')
-  const [tasaInteres, setTasaInteres] = useState('')
-  const [modalidad, setModalidad] = useState('unico')
-  const [cantidadCuotas, setCantidadCuotas] = useState('')
-  const [notas, setNotas] = useState('')
+export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel, onSave }) {
+  const editando = Boolean(prestamoExistente)
+  const [tipo, setTipo] = useState(prestamoExistente?.tipo || tipoInicial || 'doy')
+  const [persona, setPersona] = useState(prestamoExistente?.persona || '')
+  const [montoInicial, setMontoInicial] = useState(prestamoExistente?.montoInicial ?? '')
+  const [fecha, setFecha] = useState(prestamoExistente?.fecha || hoy())
+  const [fechaVencimiento, setFechaVencimiento] = useState(prestamoExistente?.fechaVencimiento || '')
+  const [tasaInteres, setTasaInteres] = useState(prestamoExistente?.tasaInteres ?? '')
+  const [modalidad, setModalidad] = useState(prestamoExistente?.modalidad || 'unico')
+  const [cantidadCuotas, setCantidadCuotas] = useState(prestamoExistente?.cantidadCuotas ?? '')
+  const [notas, setNotas] = useState(prestamoExistente?.notas || '')
 
   const puedeGuardar = persona.trim() && Number(montoInicial) > 0
 
   function handleSubmit(e) {
     e.preventDefault()
     if (!puedeGuardar) return
-    const nuevo = {
-      id: storage.uid(),
+    const base = {
+      id: editando ? prestamoExistente.id : storage.uid(),
       tipo,
       persona: persona.trim(),
       montoInicial: Number(montoInicial),
@@ -30,9 +31,12 @@ export default function FormPrestamo({ tipoInicial, onCancel, onSave }) {
       modalidad,
       cantidadCuotas: modalidad === 'cuotas' ? Number(cantidadCuotas) || null : null,
       notas: notas.trim(),
-      pagos: [],
+      pagos: editando ? prestamoExistente.pagos || [] : [],
     }
-    onSave(nuevo)
+    if (editando && prestamoExistente.historial) {
+      base.historial = prestamoExistente.historial
+    }
+    onSave(base)
   }
 
   return (
@@ -41,7 +45,7 @@ export default function FormPrestamo({ tipoInicial, onCancel, onSave }) {
         <button className="back-btn" onClick={onCancel}>← Cancelar</button>
       </div>
       <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 22, margin: '8px 0 20px' }}>
-        Nuevo préstamo
+        {editando ? 'Editar préstamo' : 'Nuevo préstamo'}
       </h2>
 
       <div className="tipo-toggle">
@@ -154,7 +158,7 @@ export default function FormPrestamo({ tipoInicial, onCancel, onSave }) {
 
         <div className="action-row">
           <button type="submit" className="btn btn-primary btn-block" disabled={!puedeGuardar}>
-            Guardar préstamo
+            {editando ? 'Guardar cambios' : 'Guardar préstamo'}
           </button>
         </div>
       </form>

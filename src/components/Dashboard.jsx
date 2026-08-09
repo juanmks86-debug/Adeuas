@@ -1,7 +1,8 @@
 import { saldoPendiente, formatMoney } from '../prestamoUtils'
 import EvolucionMensual from './EvolucionMensual'
+import RecordatoriosVencimiento from './RecordatoriosVencimiento'
 
-export default function Dashboard({ prestamos }) {
+export default function Dashboard({ prestamos, onAbrirPrestamo }) {
   const meDeben = prestamos
     .filter((p) => p.tipo === 'doy')
     .reduce((acc, p) => acc + saldoPendiente(p), 0)
@@ -28,6 +29,7 @@ export default function Dashboard({ prestamos }) {
         <span>Balance neto</span>
         <strong>{formatMoney(neto)}</strong>
       </div>
+      <RecordatoriosVencimiento prestamos={prestamos} onAbrir={onAbrirPrestamo} />
       <EvolucionMensual prestamos={prestamos} />
     </div>
   )

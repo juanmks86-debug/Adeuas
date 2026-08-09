@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { saldoPendiente, estadoPrestamo, estadoLabel, formatMoney, formatDate, iniciales, colorAvatar } from '../prestamoUtils'
 
 function IlustracionVacio() {
@@ -10,7 +11,13 @@ function IlustracionVacio() {
 }
 
 export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
-  const filtrados = prestamos.filter((p) => p.tipo === tab)
+  const [busqueda, setBusqueda] = useState('')
+
+  const delTab = prestamos.filter((p) => p.tipo === tab)
+  const filtrados = busqueda.trim()
+    ? delTab.filter((p) => p.persona.toLowerCase().includes(busqueda.trim().toLowerCase()))
+    : delTab
+
   const countDoy = prestamos.filter((p) => p.tipo === 'doy').length
   const countTomo = prestamos.filter((p) => p.tipo === 'tomo').length
 
@@ -31,12 +38,26 @@ export default function ListaPrestamos({ prestamos, tab, setTab, onOpen }) {
         </button>
       </div>
 
+      {delTab.length > 0 && (
+        <div className="search-wrap">
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Buscar por nombre"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </div>
+      )}
+
       <div className="list">
         {filtrados.length === 0 && (
           <div className="empty-state">
             <IlustracionVacio />
             <p>
-              {tab === 'doy'
+              {busqueda.trim()
+                ? 'No encontramos a nadie con ese nombre.'
+                : tab === 'doy'
                 ? 'Todavía no registraste préstamos que hayas dado.'
                 : 'Todavía no registraste deudas propias.'}
             </p>

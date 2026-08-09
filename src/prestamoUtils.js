@@ -109,6 +109,57 @@ export function colorAvatar(nombre) {
   return COLORES_AVATAR[hash % COLORES_AVATAR.length]
 }
 
+// Préstamos que vencen dentro de los próximos `diasAntes` días, o que ya vencieron
+// y siguen con saldo pendiente. Se usa para el aviso de recordatorios al abrir la app.
+export function proximosVencimientos(prestamos, diasAntes = 3) {
+  const hoy = new Date()
+  hoy.setHours(0, 0, 0, 0)
+
+  return prestamos
+    .filter((p) => p.fechaVencimiento && saldoPendiente(p) > 0)
+    .map((p) => {
+      const venc = new Date(p.fechaVencimiento + 'T00:00:00')
+      const diffDias = Math.round((venc - hoy) / (1000 * 60 * 60 * 24))
+      return { prestamo: p, diffDias }
+    })
+    .filter((item) => item.diffDias <= diasAntes)
+    .sort((a, b) => a.diffDias - b.diffDias)
+}
+
+function sumarMesesAFecha(fechaStr, n) {
+  const [y, m, d] = fechaStr.split('-').map(Number)
+  const fecha = new Date(y, m - 1 + n, d)
+  return fecha.toISOString().slice(0, 10)
+}
+
+// Genera el cronograma de cuotas (fecha de vencimiento y monto de cada una) y marca
+// cada cuota como pagada/pendiente/vencida según los pagos acumulados hasta ahora.
+export function cronogramaCuotas(p) {
+  if (p.modalidad !== 'cuotas' || !p.cantidadCuotas || p.cantidadCuotas < 1) return []
+
+  const total = montoConInteres(p)
+  const montoCuota = Math.round((total / p.cantidadCuotas) * 100) / 100
+  const pagos = [...(p.pagos || [])].sort((a, b) => (a.fecha < b.fecha ? -1 : 1))
+  const totalPagadoAcum = pagos.reduce((acc, pago) => acc + Number(pago.monto), 0)
+
+  const hoy = new Date().toISOString().slice(0, 10)
+  const cuotas = []
+  let acumuladoEsperado = 0
+
+  for (let i = 1; i <= p.cantidadCuotas; i++) {
+    acumuladoEsperado += montoCuota
+    const fechaVencimiento = sumarMesesAFecha(p.fecha, i)
+    let estado = 'pendiente'
+    if (totalPagadoAcum >= acumuladoEsperado - 0.01) {
+      estado = 'pagada'
+    } else if (fechaVencimiento < hoy) {
+      estado = 'vencida'
+    }
+    cuotas.push({ numero: i, fechaVencimiento, monto: montoCuota, estado })
+  }
+  return cuotas
+}
+
 // Renueva un préstamo: el saldo pendiente (capital + interés no pagado) pasa a ser
 // el nuevo capital, arranca un ciclo nuevo con nueva fecha/vencimiento/tasa, y el
 // ciclo anterior queda guardado en el historial del préstamo.

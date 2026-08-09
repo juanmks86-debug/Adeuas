@@ -10,7 +10,7 @@ import './styles.css'
 export default function App() {
   const [prestamos, setPrestamos] = useState(() => storage.load())
   const [tab, setTab] = useState('doy')
-  const [view, setView] = useState('lista') // 'lista' | 'nuevo' | 'detalle'
+  const [view, setView] = useState('lista') // 'lista' | 'nuevo' | 'detalle' | 'editar'
   const [selectedId, setSelectedId] = useState(null)
 
   useEffect(() => {
@@ -18,9 +18,13 @@ export default function App() {
   }, [prestamos])
 
   function handleSave(nuevo) {
-    setPrestamos((prev) => [nuevo, ...prev])
+    setPrestamos((prev) => {
+      const existe = prev.some((p) => p.id === nuevo.id)
+      return existe ? prev.map((p) => (p.id === nuevo.id ? nuevo : p)) : [nuevo, ...prev]
+    })
     setTab(nuevo.tipo)
-    setView('lista')
+    setSelectedId(nuevo.id)
+    setView(view === 'editar' ? 'detalle' : 'lista')
   }
 
   function handleUpdate(actualizado) {
@@ -38,6 +42,11 @@ export default function App() {
     setView('detalle')
   }
 
+  function openEditar(id) {
+    setSelectedId(id)
+    setView('editar')
+  }
+
   const seleccionado = prestamos.find((p) => p.id === selectedId)
 
   return (
@@ -50,7 +59,7 @@ export default function App() {
 
       {view === 'lista' && (
         <div className="view-transition" key="lista">
-          <Dashboard prestamos={prestamos} />
+          <Dashboard prestamos={prestamos} onAbrirPrestamo={openDetalle} />
           <ListaPrestamos
             prestamos={prestamos}
             tab={tab}
@@ -73,6 +82,16 @@ export default function App() {
         </div>
       )}
 
+      {view === 'editar' && seleccionado && (
+        <div className="view-transition" key={`editar-${seleccionado.id}`}>
+          <FormPrestamo
+            prestamoExistente={seleccionado}
+            onCancel={() => setView('detalle')}
+            onSave={handleSave}
+          />
+        </div>
+      )}
+
       {view === 'detalle' && seleccionado && (
         <div className="view-transition" key={seleccionado.id}>
           <DetallePrestamo
@@ -80,6 +99,7 @@ export default function App() {
             onBack={() => setView('lista')}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
+            onEditar={openEditar}
           />
         </div>
       )}

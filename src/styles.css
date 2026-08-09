@@ -449,7 +449,119 @@ button {
   margin-top: 4px;
 }
 
-/* ---- Buttons ---- */
+/* ---- Search ---- */
+.search-wrap {
+  padding: 10px 20px 0;
+}
+.search-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  background: var(--card);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink);
+}
+.search-input::placeholder {
+  color: var(--ink-soft);
+}
+
+/* ---- Recordatorios ---- */
+.recordatorios {
+  margin: 16px 20px 0;
+  border: 1px solid var(--gold);
+  border-left: 3px solid var(--gold);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 12px 14px;
+}
+.recordatorios-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.recordatorios-permiso {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 11px;
+  text-decoration: underline;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+  cursor: pointer;
+  padding: 0;
+}
+.recordatorio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 6px 0;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+}
+.recordatorio-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.recordatorio-dot.vencido { background: var(--wine); }
+.recordatorio-dot.proximo { background: var(--gold); }
+.recordatorio-persona { font-weight: 600; }
+.recordatorio-cuando {
+  color: var(--ink-soft);
+  font-size: 12px;
+  margin-left: auto;
+}
+
+/* ---- Cronograma de cuotas ---- */
+.cuota-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--paper-line);
+  font-size: 13px;
+}
+.cuota-numero {
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  width: 28px;
+  flex-shrink: 0;
+}
+.cuota-fecha {
+  flex: 1;
+}
+.cuota-monto {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.cuota-estado-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+.cuota-estado-dot.pagada { background: var(--forest-soft); }
+.cuota-estado-dot.pendiente { background: var(--card-border); }
+.cuota-estado-dot.vencida { background: var(--wine); }
 .btn {
   font-family: var(--font-body);
   font-weight: 600;
