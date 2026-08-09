@@ -569,6 +569,95 @@ button {
   font-size: 14px;
 }
 
+/* ---- Pantalla de bloqueo (PIN) ---- */
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  background: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+.lock-card {
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+}
+.lock-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--forest);
+  margin: 0 auto 14px;
+}
+.lock-card h2 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.lock-pregunta {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 20px;
+}
+.lock-dots {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.lock-dots.shake { animation: lock-shake 0.4s; }
+@keyframes lock-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.lock-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--card-border);
+  background: transparent;
+}
+.lock-dot.filled {
+  background: var(--forest);
+  border-color: var(--forest);
+}
+.lock-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 240px;
+  margin: 0 auto;
+}
+.lock-key {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.lock-key:active { background: var(--paper-line); }
+.lock-key-borrar {
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+
 /* ---- Validación inline ---- */
 .input-error {
   border-color: var(--wine) !important;

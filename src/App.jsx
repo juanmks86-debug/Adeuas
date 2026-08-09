@@ -14,6 +14,10 @@ import HistorialScreen from './components/HistorialScreen'
 import Toast from './components/Toast'
 import OnboardingOverlay from './components/OnboardingOverlay'
 import ControlTamanoLetra from './components/ControlTamanoLetra'
+import LockScreen from './components/LockScreen'
+import ConfigurarPinOverlay from './components/ConfigurarPinOverlay'
+import { tienePin } from './pinUtils'
+import { IconCandado } from './components/icons'
 import './styles.css'
 
 const KEY_ONBOARDING = 'cuentas-claras:onboarding-visto'
@@ -28,6 +32,9 @@ export default function App() {
   const [toast, setToast] = useState(null)
   const [mostrarOnboarding, setMostrarOnboarding] = useState(() => !localStorage.getItem(KEY_ONBOARDING))
   const [escala, setEscala] = useState(() => localStorage.getItem(KEY_ESCALA) || '1')
+  const [desbloqueado, setDesbloqueado] = useState(() => !tienePin())
+  const [pinVersion, setPinVersion] = useState(0) // fuerza recheck de tienePin() tras activar/desactivar
+  const [mostrarConfigPin, setMostrarConfigPin] = useState(false)
   const toastTimeout = useRef(null)
   const ultimoEliminado = useRef(null)
 
@@ -136,9 +143,19 @@ export default function App() {
   const seleccionado = prestamos.find((p) => p.id === selectedId)
   const mostrarTabBar = seccion !== 'inicio' || view === 'lista'
 
+  if (!desbloqueado) {
+    return <LockScreen onUnlock={() => setDesbloqueado(true)} />
+  }
+
   return (
     <div className="app" style={{ zoom: escala !== '1' ? escala : undefined }}>
       {mostrarOnboarding && <OnboardingOverlay onCerrar={cerrarOnboarding} />}
+      {mostrarConfigPin && (
+        <ConfigurarPinOverlay
+          onCerrar={() => setMostrarConfigPin(false)}
+          onCambio={() => setPinVersion((v) => v + 1)}
+        />
+      )}
 
       <header className="app-header">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -146,7 +163,17 @@ export default function App() {
             <h1>Cuentas Claras</h1>
             <div className="subtitle">Lo que prestás y lo que debés, en un solo lugar</div>
           </div>
-          <ControlTamanoLetra escala={escala} onCambiar={setEscala} />
+          <div style={{ display: 'flex', gap: 6 }}>
+            <ControlTamanoLetra escala={escala} onCambiar={setEscala} />
+            <button
+              className="backup-btn"
+              onClick={() => setMostrarConfigPin(true)}
+              aria-label="Configurar seguridad y PIN"
+              title="Seguridad"
+            >
+              <IconCandado width="15" height="15" />
+            </button>
+          </div>
         </div>
         <BackupPanel prestamos={prestamos} onImportar={setPrestamos} />
       </header>

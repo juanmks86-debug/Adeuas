@@ -117,6 +117,17 @@ archivado en el historial del préstamo (`prestamo.historial`).
   de pagar.
 - **Historial** — timeline de todos los pagos de todos los préstamos.
 
+### Seguridad
+- **PIN local de 4 dígitos**, opcional pero recomendado. Se activa/cambia/
+  desactiva desde el ícono de candado en el header.
+- El PIN y la respuesta de la pregunta de seguridad se guardan **hasheados**
+  (SHA-256 vía Web Crypto API), nunca en texto plano.
+- Al no haber backend, la recuperación es local: si te olvidás el PIN, se
+  responde una **pregunta de seguridad** elegida al activarlo, y eso permite
+  definir un PIN nuevo sin perder los datos.
+- La app pide el PIN cada vez que se abre desde cero (no en cada cambio de
+  pestaña dentro de la misma sesión).
+
 ### Respaldo
 - **Exportar** descarga un JSON con fecha en el nombre
   (`cuentas-claras-backup-YYYY-MM-DD.json`).
@@ -177,9 +188,13 @@ inicio). Una vez instalada:
 
 ## Limitaciones conocidas
 
-- **No hay PIN ni ninguna capa de seguridad**: cualquiera que abra el
-  dispositivo puede ver todos los préstamos. Es la mejora pendiente más
-  importante.
+- **El PIN es una capa de privacidad, no seguridad criptográfica fuerte**:
+  protege de que alguien abra la app y mire, pero como todo corre en el
+  cliente, alguien con acceso a las herramientas de desarrollador del
+  navegador podría inspeccionar el `localStorage`. Es un candado de puerta,
+  no una caja fuerte — adecuado para el caso de uso (que nadie que agarre tu
+  celu vea tus préstamos de casualidad), no para proteger contra un atacante
+  técnico con acceso al dispositivo.
 - **No hay notificaciones push reales** (con el celular bloqueado y la app
   cerrada) porque eso requiere un servidor backend que la app no tiene. Lo
   que sí hay es un aviso en el dashboard cada vez que se abre la app, y una
@@ -196,7 +211,6 @@ inicio). Una vez instalada:
 
 ## Ideas pendientes
 
-- PIN local para proteger el acceso a la app.
 - Multi-moneda.
 - Notas por pago individual (ej. "efectivo", "transferencia").
 - Contacto directo (llamar / WhatsApp) desde el detalle de un préstamo.
