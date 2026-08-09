@@ -1,25 +1,29 @@
+import { IconInicio, IconGraficos, IconCalculadora, IconPorcentaje, IconPersonas, IconReloj } from './icons'
+
 const TABS = [
-  { id: 'inicio', label: 'Inicio' },
-  { id: 'graficos', label: 'Gráficos' },
-  { id: 'calculos', label: 'Cálculos' },
-  { id: 'intereses', label: 'Intereses' },
-  { id: 'personas', label: 'Personas' },
-  { id: 'historial', label: 'Historial' },
+  { id: 'inicio', label: 'Inicio', Icon: IconInicio },
+  { id: 'graficos', label: 'Gráficos', Icon: IconGraficos },
+  { id: 'calculos', label: 'Cálculos', Icon: IconCalculadora },
+  { id: 'intereses', label: 'Intereses', Icon: IconPorcentaje },
+  { id: 'personas', label: 'Personas', Icon: IconPersonas },
+  { id: 'historial', label: 'Historial', Icon: IconReloj },
 ]
 
 export default function TabBar({ activa, onCambiar }) {
   return (
-    <div className="tabbar">
-      {TABS.map((t) => (
+    <nav className="bottom-nav" aria-label="Navegación principal">
+      {TABS.map(({ id, label, Icon }) => (
         <button
-          key={t.id}
-          className={`tabbar-item ${activa === t.id ? 'active' : ''}`}
-          onClick={() => onCambiar(t.id)}
-          aria-current={activa === t.id ? 'page' : undefined}
+          key={id}
+          className={`bottom-nav-item ${activa === id ? 'active' : ''}`}
+          onClick={() => onCambiar(id)}
+          aria-current={activa === id ? 'page' : undefined}
+          aria-label={label}
         >
-          {t.label}
+          <Icon width="20" height="20" />
+          <span>{label}</span>
         </button>
       ))}
-    </div>
+    </nav>
   )
 }
