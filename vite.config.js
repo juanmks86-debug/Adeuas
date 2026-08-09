@@ -12,8 +12,8 @@ export default defineConfig({
         name: 'Cuentas Claras — Préstamos',
         short_name: 'Cuentas Claras',
         description: 'Llevá el control de lo que prestás y lo que debés',
-        theme_color: '#1f3d2f',
-        background_color: '#f2ede1',
+        theme_color: '#0f151c',
+        background_color: '#0f151c',
         display: 'standalone',
         start_url: '/',
         icons: [

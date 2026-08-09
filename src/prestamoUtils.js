@@ -94,7 +94,7 @@ export function formatMesCorto(yyyyMm) {
   return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
 }
 
-const COLORES_AVATAR = ['#1f3d2f', '#7a2b2b', '#a9762c', '#2f5744', '#55635a']
+const COLORES_AVATAR = ['#22c55e', '#f0654f', '#f59e0b', '#3b82f6', '#a78bfa']
 
 export function iniciales(nombre) {
   const partes = nombre.trim().split(/\s+/).filter(Boolean)
