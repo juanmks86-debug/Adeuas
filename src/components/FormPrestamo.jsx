@@ -15,12 +15,18 @@ export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel,
   const [modalidad, setModalidad] = useState(prestamoExistente?.modalidad || 'unico')
   const [cantidadCuotas, setCantidadCuotas] = useState(prestamoExistente?.cantidadCuotas ?? '')
   const [notas, setNotas] = useState(prestamoExistente?.notas || '')
+  const [intentado, setIntentado] = useState(false)
 
+  const errorPersona = intentado && !persona.trim() ? 'Ingresá un nombre' : null
+  const errorMonto = intentado && !(Number(montoInicial) > 0) ? 'Ingresá un monto mayor a 0' : null
   const puedeGuardar = persona.trim() && Number(montoInicial) > 0
 
   function handleSubmit(e) {
     e.preventDefault()
-    if (!puedeGuardar) return
+    if (!puedeGuardar) {
+      setIntentado(true)
+      return
+    }
     const base = {
       id: editando ? prestamoExistente.id : storage.uid(),
       tipo,
@@ -78,7 +84,11 @@ export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel,
               onChange={(e) => setPersona(e.target.value)}
               placeholder="Nombre"
               autoFocus
+              className={errorPersona ? 'input-error' : ''}
+              aria-invalid={Boolean(errorPersona)}
+              aria-describedby={errorPersona ? 'error-persona' : undefined}
             />
+            {errorPersona && <div className="field-error" id="error-persona">{errorPersona}</div>}
           </div>
           <div className="form-row">
             <div className="form-group">
@@ -92,7 +102,11 @@ export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel,
                 value={montoInicial}
                 onChange={(e) => setMontoInicial(e.target.value)}
                 placeholder="0"
+                className={errorMonto ? 'input-error' : ''}
+                aria-invalid={Boolean(errorMonto)}
+                aria-describedby={errorMonto ? 'error-monto' : undefined}
               />
+              {errorMonto && <div className="field-error" id="error-monto">{errorMonto}</div>}
             </div>
             <div className="form-group">
               <label htmlFor="interes">Interés % (opcional)</label>
@@ -166,7 +180,7 @@ export default function FormPrestamo({ tipoInicial, prestamoExistente, onCancel,
         </div>
 
         <div className="action-row">
-          <button type="submit" className="btn btn-primary btn-block" disabled={!puedeGuardar}>
+          <button type="submit" className="btn btn-primary btn-block">
             {editando ? 'Guardar cambios' : 'Guardar préstamo'}
           </button>
         </div>

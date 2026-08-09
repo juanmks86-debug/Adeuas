@@ -61,9 +61,7 @@ export default function DetallePrestamo({ prestamo, onBack, onUpdate, onDelete, 
   }
 
   function handleDelete() {
-    if (confirm(`¿Eliminar el registro de ${prestamo.persona}? Esta acción no se puede deshacer.`)) {
-      onDelete(prestamo.id)
-    }
+    onDelete(prestamo.id)
   }
 
   return (

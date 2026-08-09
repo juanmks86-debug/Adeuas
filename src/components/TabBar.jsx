@@ -15,6 +15,7 @@ export default function TabBar({ activa, onCambiar }) {
           key={t.id}
           className={`tabbar-item ${activa === t.id ? 'active' : ''}`}
           onClick={() => onCambiar(t.id)}
+          aria-current={activa === t.id ? 'page' : undefined}
         >
           {t.label}
         </button>
